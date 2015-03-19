@@ -1,0 +1,156 @@
+<html><head>
+		<link href="css/flipclock.css" rel="stylesheet">
+		
+		<script src="js/jquery-1.10.2.min.js"></script>
+	<style type="text/css">
+		* {cursor: none;}
+
+		#wrapper {
+			display: block !important;
+			width: 850px;
+			margin: 200px auto !important;
+			text-align: center;
+		}
+		#team {
+			position: absolute;
+			font-size:50em;
+			font-weight: bold;
+			top:-200px;
+			color: #EEEEEE;
+			font-family: Arial;
+			letter-spacing:-90px;
+		}
+		body {
+			overflow:hidden;
+		}
+	</style>
+	</head>
+	<body>
+		<div id="team"> </div>
+		<div id="wrapper" style="margin:2em;" class="clock flip-clock-wrapper">
+		
+		</div>
+		
+		<script type="text/javascript">
+			var items = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890 _:'.split('');
+			var specials = "_ :".split("");
+			var generate_item = function (id, i) {
+				var c = '';
+				var label = items[i];
+				//if (i==0) c = 'flip-clock-active';
+				//if (i==1) c = 'flip-clock-before';
+				var idl = label;
+				if (specials.indexOf(idl) != -1) idl = specials.indexOf(idl)*100;
+				return '<li id="' + id + '_' + idl + '" class="' + c + '">\
+							<a href="#">\
+								<div class="up">\
+									<div class="shadow"></div>\
+									<div class="inn">' + label + '</div>\
+								</div>\
+								<div class="down">\
+									<div class="shadow"></div>\
+									<div class="inn">' + label + '</div>\
+								</div>\
+							</a>\
+						</li>';
+			}
+				
+			var LEN = 12;
+			$(document).ready(function() {
+				for (var i=0;i<LEN;i++) {
+					var str = '<ul id="item_' + i + '" data-active="A" data-before="Z" class="flip play">';
+					for (var j=0;j<items.length;j++) {
+						str += generate_item("l_" + i, j);
+					}
+					str += "</ul>";
+					$("#wrapper").append(str);
+					$("#l_" + i + "_A").addClass("flip-clock-active");
+					$("#l_" + i + "_Z").addClass("flip-clock-before");
+				}
+			});
+			
+			function set(str) {
+				for (var i=0;i<str.length;i++) {
+					var act = $("#item_" + i).attr("data-active");
+					var bef = $("#item_" + i).attr("data-before");
+					var N = str[i];
+					if (specials.indexOf(N) != -1) N = specials.indexOf(N)*100;
+					if (act == N) continue;
+					$("#l_" + i + "_" + act).removeClass("flip-clock-active");
+					$("#l_" + i + "_" + act).addClass("flip-clock-before");
+					$("#l_" + i + "_" + bef).removeClass("flip-clock-before");
+					$("#l_" + i + "_" + N).addClass("flip-clock-active");
+					
+					$("#item_" + i).attr("data-active", N);
+					$("#item_" + i).attr("data-before", act);
+				}
+			}
+			orig = [ "HAPPY NOWRUZ", " CAFE AUNJA "];
+			function put(str, cb) {
+				var steps = Math.floor(Math.random()*30+30);
+				
+				var st = [];
+				for (var i=0;i<LEN;i++) {
+					st.push(Math.floor(Math.random()*(steps-20)+20));
+				}
+				
+				var strs = [];
+				for (var i=0;i<steps;i++) {
+					var curr = "";
+					for (var j=0;j<LEN;j++) {
+						if (i > st[j]) curr += str[j];
+						else curr += items[Math.floor(Math.random()*items.length)];
+					}
+					strs.push(curr);
+				}
+				strs.push(str);
+				
+				strs.forEach(function (v, i) {
+					setTimeout(function () {
+						set(v);
+						if (i == strs.length-1) {
+							setTimeout(cb, 142);
+						}
+					}, i*142);
+				});
+			}
+			var create = function (s) {
+				var h = Math.floor(s/3600);
+				s -= h*3600;
+				var m = Math.floor(s/60);
+				s -= m*60;
+				h = (h<10?"0":"")+h;
+				m = (m<10?"0":"")+m;
+				s = (s<10?"0":"")+s;
+				return "  "+h+":"+m+":"+s + "  ";
+			}
+			var cc = 20;
+			var cd = function () {
+				cc--;
+			}
+
+			$(function () {
+				var k = setInterval(function () {
+					cd();
+					if (cc == -1) {
+						var turn = function () {
+							put(orig[0], function () {
+								setTimeout(function () {
+									put(orig[1], function () {
+										setTimeout(turn, 2000);
+									})
+								}, 2000)
+							})
+						}
+						turn();
+						clearInterval(k);
+					}else {
+						set(create(cc));
+					}
+				}, 1000);
+				
+			});
+		</script>
+		
+	
+ </body></html>
