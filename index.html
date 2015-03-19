@@ -124,15 +124,15 @@
 				s = (s<10?"0":"")+s;
 				return "  "+h+":"+m+":"+s + "  ";
 			}
-			var cc = 20;
+			var target = new Date('Sat Mar 21 2015 02:15:11 GMT+0330 (IRST)').getTime();
 			var cd = function () {
-				cc--;
+				return Math.floor( (target-new Date().getTime())/1000 );
 			}
 
 			$(function () {
 				var k = setInterval(function () {
-					cd();
-					if (cc == -1) {
+					var c = cd();
+					if (c < 0) {
 						var turn = function () {
 							put(orig[0], function () {
 								setTimeout(function () {
@@ -145,9 +145,9 @@
 						turn();
 						clearInterval(k);
 					}else {
-						set(create(cc));
+						set(create(c));
 					}
-				}, 1000);
+				}, 499);
 				
 			});
 		</script>
